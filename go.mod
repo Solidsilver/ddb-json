@@ -1,4 +1,4 @@
-module github.com/Solidsilver/ddb-marshal
+module github.com/Solidsilver/ddb-json
 
 go 1.22.0
 
