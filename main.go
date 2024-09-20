@@ -16,15 +16,27 @@ import (
 func Usage() {
 	exeName := path.Base(os.Args[0])
 	fmt.Fprintf(os.Stderr,
-		"Usage of %s:\n"+
-			"\tReads in json from stdin or from a file,\n"+
-			"\tprints out DynamoDB formatted JSON\n\n", exeName)
+		"Convert JSON to DynamoDB format\n\n"+
+			"Reads JSON input from a file, standard input, or directly from the command line,\n"+
+			"and converts it to DynamoDB-compatible JSON format.\n\n"+
+			"USAGE:\n"+
+			"  %s [OPTIONS] [FILE | JSON_STRING]\n\n"+
+			"OPTIONS:\n", exeName)
 	flag.PrintDefaults()
 	fmt.Fprintf(os.Stderr,
-		"\nExamples:\n"+
-			"\t%s -f <json-file>\n"+
-			"\t%s < file.json\n"+
-			"\techo '{ \"a\": \"b\" }' | %s \n", exeName, exeName, exeName)
+		"\nARGUMENTS:\n"+
+			"  FILE                    Path to the input JSON file\n"+
+			"  JSON_STRING             JSON data provided directly on the command line\n\n"+
+			"NOTES:\n"+
+			"  * Only one input method is allowed at a time.\n"+
+			"  * Precedence: `--file` > command-line JSON string > standard input\n\n"+
+			"EXAMPLES:\n"+
+			"  # From a file:\n"+
+			"  %s -f input.json\n\n"+
+			"  # From command-line arguments (JSON string):\n"+
+			"  %s '{\"a\": \"b\"}'\n\n"+
+			"  # From standard input (piped):\n"+
+			"  cat input.json | %s \n", exeName, exeName, exeName)
 }
 
 func main() {
@@ -35,6 +47,8 @@ func main() {
 	flag.Parse()
 	if *fileIn != "" {
 		readIn, err = os.ReadFile(*fileIn)
+	} else if len(os.Args) > 1 {
+		readIn = []byte(os.Args[1])
 	} else {
 		readIn, err = io.ReadAll(os.Stdin)
 	}
